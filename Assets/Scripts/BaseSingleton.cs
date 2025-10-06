@@ -5,12 +5,11 @@ using UnityEngine;
 
 public class BaseSingleton<T> : NetworkBehaviour where T : NetworkBehaviour
 {
-
     private static T _instance;
-    private static readonly object _instanceLock = new object();
+    private static readonly object _instanceLock = new();
     private static bool _quitting = false;
 
-    public static T instance
+    public static T Instance
     {
         get
         {
@@ -18,34 +17,28 @@ public class BaseSingleton<T> : NetworkBehaviour where T : NetworkBehaviour
             {
                 if (_instance == null && !_quitting)
                 {
-
                     _instance = FindFirstObjectByType<T>();
                     if (_instance == null)
                     {
-                        Instantiate();
+                        Debug.LogError($"Instance of {typeof(T)} not found in scene. " +
+                                       $"Make sure it's placed in the starting scene with a NetworkObject.");
                     }
                 }
-
                 return _instance;
             }
         }
     }
 
-    public static void Instantiate()
-    {
-        GameObject go = new GameObject(typeof(T).ToString());
-        _instance = go.AddComponent<T>();
-
-        DontDestroyOnLoad(_instance.gameObject);
-    }
-
     protected virtual void Awake()
     {
-        if (_instance == null) _instance = gameObject.GetComponent<T>();
-        else if (_instance.GetInstanceID() != GetInstanceID())
+        if (_instance == null)
+        {
+            _instance = (T)(object)this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (_instance != this)
         {
             Destroy(gameObject);
-            throw new System.Exception(string.Format("Instance of {0} already exists, removing {1}", GetType().FullName, ToString()));
         }
     }
 

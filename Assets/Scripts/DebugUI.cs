@@ -26,7 +26,7 @@ public class DebugUI : MonoBehaviour
     {
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("Connected Players:");
-        foreach (var p in GameManager.instance.Players)
+        foreach (var p in GameManager.Instance.GetPlayerObjects())
         {
             if (p != null)
                 sb.AppendLine($"- {p.name} - {p.transform.position:F2}");
