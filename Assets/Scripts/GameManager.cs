@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
+ï»¿using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -7,13 +6,19 @@ public class GameManager : BaseSingleton<GameManager>
 {
     [SerializeField] private GameObject v_EnemyPrefab;
 
-    public NetworkList<ulong> PlayersIds;
+    // âœ… Instanciation directe (obligatoire pour Netcode)
+    public NetworkList<ulong> PlayersIds = new();
+    public NetworkList<ulong> AIIds = new();
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+
         if (IsServer)
         {
+            PlayersIds.Clear();
+            AIIds.Clear();
+
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
         }
@@ -31,27 +36,60 @@ public class GameManager : BaseSingleton<GameManager>
             PlayersIds.Remove(clientId);
     }
 
-    protected override void Awake()
-    {
-        base.Awake();
-        PlayersIds = new NetworkList<ulong>();
-    }
-
     /// <summary>
-    /// Fait apparaître un ennemi sur le serveur à une position donnée.
+    /// Fait apparaÃ®tre une IA sur le serveur Ã  une position donnÃ©e.
     /// </summary>
     [ServerRpc(RequireOwnership = false)]
     public void SpawnEnemyServerRpc(Vector2 p_Pos)
     {
         GameObject v_Enemy = Instantiate(v_EnemyPrefab, p_Pos, Quaternion.identity);
-        v_Enemy.GetComponent<NetworkObject>().Spawn(true);
+        var v_NetObj = v_Enemy.GetComponent<NetworkObject>();
+        v_NetObj.Spawn(true);
+
+        AIIds.Add(v_NetObj.NetworkObjectId);
     }
 
     /// <summary>
-    /// Permet de récupérer la liste des objets Player actuellement présents dans la scène.
+    /// Retourne la liste des joueurs actifs.
     /// </summary>
     public List<Player> GetPlayerObjects()
     {
-        return FindObjectsByType<Player>(FindObjectsSortMode.None).ToList();
+        List<Player> v_Result = new();
+
+        foreach (ulong v_ClientId in PlayersIds)
+        {
+            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(v_ClientId, out var v_Client))
+            {
+                var v_PlayerObj = v_Client.PlayerObject;
+                if (v_PlayerObj != null)
+                {
+                    var v_Player = v_PlayerObj.GetComponent<Player>();
+                    if (v_Player != null)
+                        v_Result.Add(v_Player);
+                }
+            }
+        }
+
+        return v_Result;
+    }
+
+    /// <summary>
+    /// Retourne la liste des IA actives.
+    /// </summary>
+    public List<Enemy> GetAIObjects()
+    {
+        List<Enemy> v_Result = new();
+
+        foreach (ulong v_ObjId in AIIds)
+        {
+            if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(v_ObjId, out var v_Obj))
+            {
+                var v_Enemy = v_Obj.GetComponent<Enemy>();
+                if (v_Enemy != null)
+                    v_Result.Add(v_Enemy);
+            }
+        }
+
+        return v_Result;
     }
 }

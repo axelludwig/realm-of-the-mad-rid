@@ -31,6 +31,12 @@ public class DebugUI : MonoBehaviour
             if (p != null)
                 sb.AppendLine($"- {p.name} - {p.transform.position:F2}");
         }
+        sb.AppendLine("IAs:");
+        foreach (var p in GameManager.Instance.GetAIObjects())
+        {
+            if (p != null)
+                sb.AppendLine($"- {p.name} - {p.transform.position:F2}");
+        }
         return sb.ToString();   
     }
 
