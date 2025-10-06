@@ -291,6 +291,22 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: -8680804728657123719}
+        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
+        m_MethodName: OnSpawnEnemy
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 9d3d08ad-be25-4c47-80dc-94a67da7dec8
+    m_ActionName: 'Player/SpawnEnemy[/Keyboard/r]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -310,6 +326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   ShowTopMostFoldoutHeaderGroup: 1
   ProjectilePrefab: {fileID: 2396441285780664901, guid: 1fb99d2260a9ae3488d674138c8c6807, type: 3}
+  EnemyPrefab: {fileID: 4434351592986436743, guid: 964575d1bc6671848a30280d084375ba, type: 3}
 --- !u!114 &-8803865598882946362
 MonoBehaviour:
   m_ObjectHideFlags: 0

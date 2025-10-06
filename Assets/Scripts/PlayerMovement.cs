@@ -6,6 +6,7 @@ public class PlayerMovement : NetworkBehaviour
 {
     private Vector2 v_MoveInput;
     [SerializeField] private GameObject ProjectilePrefab;
+    [SerializeField] private GameObject EnemyPrefab;
 
     private Camera Camera;
 
@@ -20,7 +21,7 @@ public class PlayerMovement : NetworkBehaviour
     /// </summary>
     public void OnAttack(InputAction.CallbackContext p_Context)
     {
-        if (!IsOwner || !p_Context.performed) return;
+        if (!IsOwner || !p_Context.performed || !Camera) return;
 
         // Calcul direction souris
         Vector3 v_MouseWorld = Camera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
@@ -28,6 +29,28 @@ public class PlayerMovement : NetworkBehaviour
 
         // Demande au serveur d’instancier le projectile
         SpawnProjectileServerRpc(transform.position, v_Direction);
+    }
+
+    /// <summary>
+    /// Détecte la touche R .
+    /// </summary>
+    public void OnSpawnEnemy(InputAction.CallbackContext p_Context)
+    {
+        if (!IsOwner || !p_Context.performed) return;
+
+        // Calcul direction souris
+        Vector3 v_MouseWorld = Camera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        v_MouseWorld.z = 0;
+
+        // Demande au serveur d’instancier le monstre
+        SpawnEnemyServerRpc(v_MouseWorld);
+    }
+
+    [ServerRpc]
+    private void SpawnEnemyServerRpc(Vector3 p_Position)
+    {
+        GameObject v_Enemy = Instantiate(EnemyPrefab, p_Position, Quaternion.identity);
+        v_Enemy.GetComponent<NetworkObject>().Spawn();
     }
 
     [ServerRpc]
