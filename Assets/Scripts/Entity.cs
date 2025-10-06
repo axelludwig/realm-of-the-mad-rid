@@ -1,5 +1,12 @@
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
+
+public enum DamageType
+{
+    StrengthBased,
+    IntelligenceBased
+}
 
 public class Entity : NetworkBehaviour
 {
@@ -47,5 +54,25 @@ public class Entity : NetworkBehaviour
         Strength = new Stat(0);
         Intelligence = new Stat(0);
         CooldownReduction = new Stat(0);
+    }
+
+    public void TakeDamage(float rawDamage, Entity dealer)
+    {
+        float armorDamageMultiplier = 1f / (1f + Armour.CurrentValue / Health.CurrentValue);
+        float valueAfterArmourReduction = rawDamage * armorDamageMultiplier;
+        Health.Decrease(valueAfterArmourReduction);
+        if (Health.CurrentValue <= 0) Die();
+    }
+
+    public void DealDamage(float rawDamage, Entity target, DamageType damageType = DamageType.StrengthBased)
+    {
+        float damageMultiplier = 1 + (damageType == DamageType.StrengthBased ? Strength.CurrentValue : Intelligence.CurrentValue) / 100;
+        float valueAfterStatApplied = rawDamage * damageMultiplier;
+        target.TakeDamage(valueAfterStatApplied, this);
+    }
+
+    public void Die()
+    {
+        Debug.Log("I dieded");
     }
 }
