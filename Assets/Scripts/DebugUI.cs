@@ -1,5 +1,5 @@
+using System.Text;
 using TMPro;
-using UnityEditor.U2D.Aseprite;
 using UnityEngine;
 
 public class DebugUI : MonoBehaviour
@@ -17,7 +17,21 @@ public class DebugUI : MonoBehaviour
         string debugText = "Menu de debug de chiasse";
 
         debugText += "\n" + fps + " fps";
+        debugText += "\n" + GetConnectedPlayersAsString();
+
         text.text = debugText;
+    }
+
+    string GetConnectedPlayersAsString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("Connected Players:");
+        foreach (var p in GameManager.instance.Players)
+        {
+            if (p != null)
+                sb.AppendLine($"- {p.name} - {p.transform.position:F2}");
+        }
+        return sb.ToString();   
     }
 
     void UpdateFpsCounter()   
