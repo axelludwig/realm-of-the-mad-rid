@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4833758683194857717}
   - component: {fileID: -151340431454285934}
   - component: {fileID: -8680804728657123719}
+  - component: {fileID: -8803865598882946362}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -309,3 +310,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   ShowTopMostFoldoutHeaderGroup: 1
   ProjectilePrefab: {fileID: 2396441285780664901, guid: 1fb99d2260a9ae3488d674138c8c6807, type: 3}
+--- !u!114 &-8803865598882946362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3066897766606161360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86071b6b9c83de4409475b65953fcd29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player

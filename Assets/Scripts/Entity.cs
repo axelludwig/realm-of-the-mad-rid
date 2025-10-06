@@ -47,6 +47,4 @@ public class Entity : MonoBehaviour
         Intelligence = new Stat(0);
         CooldownReduction = new Stat(0);
     }
-
-
 }
