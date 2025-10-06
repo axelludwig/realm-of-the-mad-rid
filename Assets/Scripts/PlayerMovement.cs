@@ -42,8 +42,10 @@ public class PlayerMovement : NetworkBehaviour
         Vector3 v_MouseWorld = Camera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         v_MouseWorld.z = 0;
 
+        GameManager.instance.SpawnEnemyServerRpc(v_MouseWorld);
+
         // Demande au serveur d’instancier le monstre
-        SpawnEnemyServerRpc(v_MouseWorld);
+        //SpawnEnemyServerRpc(v_MouseWorld);
     }
 
     [ServerRpc]
