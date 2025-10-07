@@ -25,7 +25,6 @@ public class Projectile : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log(other);
         if (!IsServer) return;
 
         var entity = other.gameObject.GetComponent<Enemy>();
