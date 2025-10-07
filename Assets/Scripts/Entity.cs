@@ -48,9 +48,16 @@ public class Entity : NetworkBehaviour
 
     FloatingHealthBar healthBar;
 
+    public NetworkVariable<float> NetworkedHealth = new NetworkVariable<float>(
+        100f,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
+
+
     protected virtual void Awake()
     {
-        Debug.Log("Awaking Umtity");
         Health = new Stat(100);
         Armour = new Stat(0);
         MovementSpeed = new Stat(1);
@@ -60,30 +67,47 @@ public class Entity : NetworkBehaviour
         CooldownReduction = new Stat(0);
     }
 
-    public void Start()
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
         healthBar = GetComponentInChildren<FloatingHealthBar>();
-        healthBar.UpdateHealthBar(Health.CurrentValue / Health.MaxValue);
+
+        NetworkedHealth.OnValueChanged += (oldValue, newValue) =>
+        {
+            if (healthBar != null)
+                healthBar.UpdateHealthBar(newValue / Health.MaxValue);
+        };
+
+        healthBar?.UpdateHealthBar(NetworkedHealth.Value / Health.MaxValue);
     }
 
-    public void TakeDamage(float rawDamage, Entity dealer)
+    [ServerRpc]
+    public void TakeDamageServerRpc(float rawDamage, ulong dealerId)
     {
         float armorDamageMultiplier = 1f / (1f + Armour.CurrentValue / Health.CurrentValue);
         float valueAfterArmourReduction = rawDamage * armorDamageMultiplier;
+
         Health.Decrease(valueAfterArmourReduction);
-        healthBar.UpdateHealthBar(Health.CurrentValue / Health.MaxValue);
+        NetworkedHealth.Value = Health.CurrentValue;
         if (Health.CurrentValue <= 0) Die();
     }
 
     public void DealDamage(float rawDamage, Entity target, DamageType damageType = DamageType.StrengthBased)
     {
+        if (!IsOwner) return;
+
         float damageMultiplier = 1 + (damageType == DamageType.StrengthBased ? Strength.CurrentValue : Intelligence.CurrentValue) / 100;
         float valueAfterStatApplied = rawDamage * damageMultiplier;
-        target.TakeDamage(valueAfterStatApplied, this);
+
+        target.TakeDamageServerRpc(valueAfterStatApplied, OwnerClientId);
     }
 
     public void Die()
     {
-        Debug.Log("I dieded");
+        if(IsServer)
+        {
+            GetComponent<NetworkObject>().Despawn();
+        }
     }
 }

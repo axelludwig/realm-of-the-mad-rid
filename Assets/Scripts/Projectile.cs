@@ -25,8 +25,14 @@ public class Projectile : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log(other);
         if (!IsServer) return;
-        // Exemple : détruire après impact
+
+        var entity = other.gameObject.GetComponent<Enemy>();
+        if(entity != null)
+        {
+            entity.TakeDamageServerRpc(10, OwnerClientId);
+        }
         DestroyProjectileServerRpc();
     }
 
