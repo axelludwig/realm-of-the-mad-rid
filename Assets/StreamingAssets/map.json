@@ -1,0 +1,10 @@
+{
+  "seed": 12345,
+  "biomeRegions": [
+    {
+      "biomeId": "plains",
+      "center": [0, 0],
+      "radius": 1
+    }
+  ]
+}
