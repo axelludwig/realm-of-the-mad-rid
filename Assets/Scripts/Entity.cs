@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public enum DamageType
 {
@@ -45,8 +46,11 @@ public class Entity : NetworkBehaviour
     /// </summary>
     public Stat CooldownReduction { get; private set; }
 
+    FloatingHealthBar healthBar;
+
     protected virtual void Awake()
     {
+        Debug.Log("Awaking Umtity");
         Health = new Stat(100);
         Armour = new Stat(0);
         MovementSpeed = new Stat(1);
@@ -56,11 +60,18 @@ public class Entity : NetworkBehaviour
         CooldownReduction = new Stat(0);
     }
 
+    public void Start()
+    {
+        healthBar = GetComponentInChildren<FloatingHealthBar>();
+        healthBar.UpdateHealthBar(Health.CurrentValue / Health.MaxValue);
+    }
+
     public void TakeDamage(float rawDamage, Entity dealer)
     {
         float armorDamageMultiplier = 1f / (1f + Armour.CurrentValue / Health.CurrentValue);
         float valueAfterArmourReduction = rawDamage * armorDamageMultiplier;
         Health.Decrease(valueAfterArmourReduction);
+        healthBar.UpdateHealthBar(Health.CurrentValue / Health.MaxValue);
         if (Health.CurrentValue <= 0) Die();
     }
 
