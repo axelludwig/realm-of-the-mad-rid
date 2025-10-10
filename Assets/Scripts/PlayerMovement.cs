@@ -5,15 +5,29 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : NetworkBehaviour
 {
     private Vector2 v_MoveInput;
+    private Entity entity;
     [SerializeField] private GameObject ProjectilePrefab;
     [SerializeField] private GameObject EnemyPrefab;
+
+    private float lastAttackTime;
+    private bool isAttacking;
 
     private Camera Camera;
 
     private void Start()
     {
+        entity = GetComponent<Entity>();
         if (IsOwner)
             Camera = Camera.main;
+    }
+
+    private void Update()
+    {
+        if (!IsOwner) return;
+        HandleMovement();
+
+        if (!isAttacking) return;
+        HandleAttackHold();
     }
 
     /// <summary>
@@ -21,14 +35,35 @@ public class PlayerMovement : NetworkBehaviour
     /// </summary>
     public void OnAttack(InputAction.CallbackContext p_Context)
     {
-        if (!IsOwner || !p_Context.performed || !Camera) return;
+        if (!IsOwner || !Camera) return;
 
-        // Calcul direction souris
+        if(p_Context.started)
+        {
+            isAttacking = true;
+        } 
+        else if(p_Context.canceled)
+        {
+            isAttacking = false;
+        }
+    }
+
+    private void HandleAttackHold()
+    {
+        var attackCooldown = 1 / entity.Stats.AttackSpeed.CurrentValue;
+        if (Time.time - lastAttackTime < attackCooldown) return;
+
+        lastAttackTime = Time.time;
+
         Vector3 v_MouseWorld = Camera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         Vector2 v_Direction = (v_MouseWorld - transform.position).normalized;
 
-        // Demande au serveur d’instancier le projectile
         SpawnProjectileServerRpc(transform.position, v_Direction);
+    }
+
+    private void HandleMovement()
+    {
+        Vector3 v_Movement = new Vector3(v_MoveInput.x, v_MoveInput.y, 0f);
+        transform.position += v_Movement * entity.Stats.MovementSpeed.CurrentValue * Time.deltaTime;
     }
 
     /// <summary>
@@ -60,14 +95,5 @@ public class PlayerMovement : NetworkBehaviour
     public void OnMove(InputAction.CallbackContext p_Context)
     {
         v_MoveInput = p_Context.ReadValue<Vector2>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (!IsOwner) return;
-
-        Vector3 v_Movement = new Vector3(v_MoveInput.x, v_MoveInput.y, 0f);
-        transform.position += v_Movement * 5 * Time.deltaTime;
     }
 }

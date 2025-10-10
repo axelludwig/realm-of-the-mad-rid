@@ -460,6 +460,10 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkedHealth:
     m_InternalValue: 100
+  NetworkXP:
+    m_InternalValue: 0
+  NetworkLevel:
+    m_InternalValue: 0
 --- !u!114 &1315466598737079817
 MonoBehaviour:
   m_ObjectHideFlags: 0
