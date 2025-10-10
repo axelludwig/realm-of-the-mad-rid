@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 public class DebugUI : MonoBehaviour
@@ -13,12 +14,28 @@ public class DebugUI : MonoBehaviour
         UpdateFpsCounter();
 
         StringBuilder debugText = new StringBuilder();
-        debugText.AppendLine("Menu de debug de chiasse 💩");
+        debugText.AppendLine("Menu de debug de chiasse");
         debugText.AppendLine($"{fps} fps");
         debugText.AppendLine();
+        debugText.AppendLine(GetHealthAndXpAsString());
         debugText.AppendLine(GetConnectedPlayersAsString());
 
         text.text = debugText.ToString();
+    }
+
+    string GetHealthAndXpAsString()
+    {
+        var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+        if (playerObject == null) return "";
+        var player = playerObject.GetComponent<Entity>();
+        if (player == null) return "";
+
+        StringBuilder debugText = new StringBuilder();
+        debugText.AppendLine($"PV {player.Stats.Health.CurrentValue}/{player.Stats.Health.MaxValue}");
+        debugText.AppendLine($"Lvl {player.Experience.Level}");
+        debugText.AppendLine($"Exp {player.Experience.ExperiencePoints}/{player.Experience.ExperienceForNextLevel}");
+
+        return debugText.ToString();
     }
 
     string GetConnectedPlayersAsString()
