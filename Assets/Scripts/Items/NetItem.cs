@@ -5,12 +5,14 @@ public struct NetItem : INetworkSerializable, System.IEquatable<NetItem>
 {
     public int ItemId;
     public FixedString64Bytes Name;
+    public FixedString64Bytes Id;
     public FixedList128Bytes<ItemStat> Stats;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref ItemId);
         serializer.SerializeValue(ref Name);
+        serializer.SerializeValue(ref Id);
 
         // 👇 Sérialisation manuelle de la FixedList
         int count = Stats.Length;

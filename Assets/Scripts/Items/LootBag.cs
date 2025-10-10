@@ -9,7 +9,7 @@ using System.Collections.Generic;
 [RequireComponent(typeof(NetworkObject), typeof(Collider))]
 public class LootBag : NetworkBehaviour
 {
-    [SerializeField] private List<string> ItemNames = new(); // Liste des noms d'items à donner
+    [SerializeField] private List<string> ItemIds = new(); // Liste des noms d'items à donner
     [SerializeField] private float RespawnTime = 0f; // 0 = pas de respawn
     [SerializeField] private bool DestroyAfterLoot = true;
 
@@ -25,7 +25,7 @@ public class LootBag : NetworkBehaviour
             return;
 
         // ✅ Donne tous les items
-        foreach (var v_ItemName in ItemNames)
+        foreach (var v_ItemName in ItemIds)
         {
             v_Inventory.AddItemInternal(v_ItemName);
         }
@@ -62,6 +62,6 @@ public class LootBag : NetworkBehaviour
     /// </summary>
     public void SetItems(List<string> p_Items)
     {
-        ItemNames = p_Items;
+        ItemIds = p_Items;
     }
 }

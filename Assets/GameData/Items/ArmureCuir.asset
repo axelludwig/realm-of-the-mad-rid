@@ -10,12 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c08d9f05cf0cf9345addb1dbe6a595ef, type: 3}
-  m_Name: CouteauRouille
+  m_Name: ArmureCuir
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  ItemName: "Couteau rouill\xE9"
-  ItemId: couteau-rouille
+  ItemName: Armure de cuir
+  ItemId: armure-cuir
   Rarity: 0
   StatBonuses:
-  - StatType: 3
-    MinValue: 10
-    MaxValue: 15
+  - StatType: 0
+    MinValue: 20
+    MaxValue: 30
+  - StatType: 1
+    MinValue: 5
+    MaxValue: 10

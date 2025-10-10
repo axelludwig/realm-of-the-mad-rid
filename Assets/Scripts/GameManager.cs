@@ -23,8 +23,8 @@ public class GameManager : BaseSingleton<GameManager>
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
 
-            SpawnLoot(new Vector3(3f, 3f, 0f));
-            SpawnLoot(new Vector3(3f, -3f, 0f));
+            SpawnLoot("armure-cuir", new Vector3(3f, 3f, 0f));
+            SpawnLoot("couteau-rouille", new Vector3(3f, -3f, 0f));
         }
     }
 
@@ -71,13 +71,13 @@ public class GameManager : BaseSingleton<GameManager>
         AIIds.Add(v_NetObj.NetworkObjectId);
     }
 
-    private void SpawnLoot(Vector2 p_Pos)
+    private void SpawnLoot(string p_itemId, Vector2 p_Pos)
     {
         GameObject v_Loot = Instantiate(LootBagPrefab, p_Pos, Quaternion.identity);
         LootBag v_LootBag = v_Loot.GetComponent<LootBag>();
 
         // ✅ Exemple : plusieurs équipements dans le même loot
-        v_LootBag.SetItems(new List<string> { "Couteau rouillé"});
+        v_LootBag.SetItems(new List<string> { p_itemId });
 
         v_Loot.GetComponent<NetworkObject>().Spawn(true);
         Debug.Log("💰 LootBag multi-items spawnée au sol !");
@@ -88,6 +88,9 @@ public class GameManager : BaseSingleton<GameManager>
     /// </summary>
     public List<Player> GetPlayerObjects()
     {
+        if (NetworkManager.Singleton == null)
+            return new List<Player>();
+
         List<Player> v_Result = new();
 
         foreach (ulong v_ClientId in PlayersIds)

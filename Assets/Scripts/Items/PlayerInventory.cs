@@ -30,16 +30,16 @@ public class PlayerInventory : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void AddItemServerRpc(string p_ItemName)
+    public void AddItemServerRpc(string p_ItemId)
     {
-        AddItemInternal(p_ItemName);
+        AddItemInternal(p_ItemId);
     }
 
     /// <summary>
     /// Ajoute un item à l’inventaire du joueur.
     /// </summary>
     /// <param name="p_ItemName"></param>
-    public void AddItemInternal(string p_ItemName)
+    public void AddItemInternal(string p_ItemId)
     {
         if (!IsServer)
         {
@@ -55,12 +55,13 @@ public class PlayerInventory : NetworkBehaviour
 
 
         var db = ItemManager.Instance.GetDatabase();
-        var item = ItemManager.Instance.GenerateItemByName(p_ItemName);
+        var item = ItemManager.Instance.GenerateItemById(p_ItemId);
         if (item == null) return;
 
         NetItem ni = default;
         ni.ItemId = GetItemId(item.Data);
         ni.Name = item.Data.ItemName;
+        ni.Id = p_ItemId;
 
         var ordered = item.FinalStats.OrderBy(k => k.Key);
         foreach (var kv in ordered)
@@ -68,13 +69,8 @@ public class PlayerInventory : NetworkBehaviour
             if (ni.Stats.Length < ni.Stats.Capacity)
                 ni.Stats.Add(new ItemStat { Type = kv.Key, Value = kv.Value });
             else
-                Debug.LogWarning($"Trop de stats pour l’item {p_ItemName} (capacité FixedList atteinte).");
+                Debug.LogWarning($"Trop de stats pour l’item {p_ItemId} (capacité FixedList atteinte).");
         }
-
-        Debug.Log($"[{name}] AddItemInternal pour joueur {OwnerClientId}, " +
-          $"IsSpawned={IsSpawned}, NetworkObject.IsSpawned={NetworkObject.IsSpawned}, " +
-          $"IsServer={IsServer}, NetworkManager.Singleton.IsServer={NetworkManager.Singleton.IsServer}");
-
 
         _items.Add(ni);
     }

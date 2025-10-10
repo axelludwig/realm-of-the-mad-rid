@@ -9,14 +9,14 @@ public class ItemDatabase : ScriptableObject
     /// <summary>
     /// Recherche un item par son nom.
     /// </summary>
-    public ItemData GetItemByName(string p_Name)
+    public ItemData GetItemById(string p_Id)
     {
         foreach (var v_Item in AllItems)
         {
-            if (v_Item.ItemName == p_Name)
+            if (v_Item.ItemId == p_Id)
                 return v_Item;
         }
-        Debug.LogWarning($"Item introuvable dans la database : {p_Name}");
+        Debug.LogWarning($"Item introuvable dans la database : {p_Id}");
         return null;
     }
 

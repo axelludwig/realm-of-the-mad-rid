@@ -58,7 +58,7 @@ public class DebugUI : MonoBehaviour
             {
                 foreach (var v_Item in v_Inventory.GetInventory())
                 {
-                    sb.AppendLine($"    - {v_Item.Name}");
+                    sb.AppendLine($"    - {v_Item.Name}  (id: {v_Item.Id})");
 
                     // 💡 Afficher les stats détaillées de l’item
                     foreach (var v_Stat in v_Item.Stats)
