@@ -1,50 +1,77 @@
-using System.Text;
+﻿using System.Text;
 using TMPro;
 using UnityEngine;
 
 public class DebugUI : MonoBehaviour
 {
-    [SerializeField]
-    TextMeshProUGUI text;
-    float fps;
-    float timer;
+    [SerializeField] private TextMeshProUGUI text;
+    private float fps;
+    private float timer;
 
-    // Update is called once per frame
     void Update()
     {
         UpdateFpsCounter();
 
-        string debugText = "Menu de debug de chiasse";
+        StringBuilder debugText = new StringBuilder();
+        debugText.AppendLine("Menu de debug de chiasse 💩");
+        debugText.AppendLine($"{fps} fps");
+        debugText.AppendLine();
+        debugText.AppendLine(GetConnectedPlayersAsString());
 
-        debugText += "\n" + fps + " fps";
-        debugText += "\n" + GetConnectedPlayersAsString();
-
-        text.text = debugText;
+        text.text = debugText.ToString();
     }
 
     string GetConnectedPlayersAsString()
     {
         StringBuilder sb = new StringBuilder();
+
         sb.AppendLine("Connected Players:");
-        foreach (var p in GameManager.Instance.GetPlayerObjects())
+
+        foreach (var v_Player in GameManager.Instance.GetPlayerObjects())
         {
-            if (p != null)
-                sb.AppendLine($"- {p.name} - {p.transform.position:F2}");
+            if (v_Player == null)
+                continue;
+
+            var v_Pos = v_Player.transform.position;
+            var v_Inventory = v_Player.GetComponent<PlayerInventory>();
+
+            sb.AppendLine($"- {v_Player.name} @ {v_Pos:F2}");
+
+            if (v_Inventory != null && v_Inventory.Items.Count > 0)
+            {
+                foreach (var v_Item in v_Inventory.Items)
+                {
+                    sb.AppendLine($"    - {v_Item.Data.ItemName}");
+
+                    // 💡 Afficher les stats détaillées de l’item
+                    foreach (var v_Stat in v_Item.FinalStats)
+                    {
+                        sb.AppendLine($"        {v_Stat.Key}: +{v_Stat.Value:F1}");
+                    }
+                }
+            }
+            else
+            {
+                sb.AppendLine("    (aucun item)");
+            }
         }
+
+        sb.AppendLine();
         sb.AppendLine("IAs:");
-        foreach (var p in GameManager.Instance.GetAIObjects())
+        foreach (var ai in GameManager.Instance.GetAIObjects())
         {
-            if (p != null)
-                sb.AppendLine($"- {p.name} - {p.transform.position:F2}");
+            if (ai != null)
+                sb.AppendLine($"- {ai.name} @ {ai.transform.position:F2}");
         }
-        return sb.ToString();   
+
+        return sb.ToString();
     }
 
-    void UpdateFpsCounter()   
+    void UpdateFpsCounter()
     {
         if (timer > 1f)
         {
-            fps = (int)(1f / Time.unscaledDeltaTime); fps = (int)(1f / Time.unscaledDeltaTime);
+            fps = (int)(1f / Time.unscaledDeltaTime);
             timer = 0;
         }
         else

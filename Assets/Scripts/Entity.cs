@@ -1,7 +1,4 @@
 using Unity.Netcode;
-using UnityEngine;
-using UnityEngine.UI;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public enum DamageType
 {
