@@ -36,9 +36,8 @@ public class PlayerInventory : NetworkBehaviour
     }
 
     /// <summary>
-    /// Ajoute un item à l’inventaire du joueur.
+    /// Ajoute un item au joueur (serveur uniquement).
     /// </summary>
-    /// <param name="p_ItemName"></param>
     public void AddItemInternal(string p_ItemId)
     {
         if (!IsServer)
@@ -53,33 +52,11 @@ public class PlayerInventory : NetworkBehaviour
             return;
         }
 
+        // ✅ Génération directe du NetItem complet
+        var v_NetItem = ItemManager.Instance.GenerateNetItemById(p_ItemId);
+        if (v_NetItem.Equals(default)) return;
 
-        var db = ItemManager.Instance.GetDatabase();
-        var item = ItemManager.Instance.GenerateItemById(p_ItemId);
-        if (item == null) return;
-
-        NetItem ni = default;
-        ni.ItemId = GetItemId(item.Data);
-        ni.Name = item.Data.ItemName;
-        ni.Id = p_ItemId;
-
-        var ordered = item.FinalStats.OrderBy(k => k.Key);
-        foreach (var kv in ordered)
-        {
-            if (ni.Stats.Length < ni.Stats.Capacity)
-                ni.Stats.Add(new ItemStat { Type = kv.Key, Value = kv.Value });
-            else
-                Debug.LogWarning($"Trop de stats pour l’item {p_ItemId} (capacité FixedList atteinte).");
-        }
-
-        _items.Add(ni);
-    }
-
-    private int GetItemId(ItemData data)
-    {
-        var db = ItemManager.Instance.GetDatabase();
-        for (int i = 0; i < db.AllItems.Length; i++)
-            if (db.AllItems[i] == data) return i;
-        return -1;
+        _items.Add(v_NetItem);
+        Debug.Log($"🧳 Ajouté à l’inventaire du joueur {OwnerClientId} : {v_NetItem.Name} [#{v_NetItem.UniqueId}]");
     }
 }

@@ -25,6 +25,9 @@ public class DebugUI : MonoBehaviour
 
     string GetHealthAndXpAsString()
     {
+        if (NetworkManager.Singleton == null)
+            return "";
+
         var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
         if (playerObject == null) return "";
         var player = playerObject.GetComponent<Entity>();
@@ -44,21 +47,36 @@ public class DebugUI : MonoBehaviour
 
         sb.AppendLine("Connected Players:");
 
-        foreach (var v_Player in GameManager.Instance.GetPlayerObjects())
+        foreach (Player v_Player in GameManager.Instance.GetPlayerObjects())
         {
             if (v_Player == null)
                 continue;
 
             var v_Pos = v_Player.transform.position;
-            var v_Inventory = v_Player.GetComponent<PlayerInventory>();
-
             sb.AppendLine($"- {v_Player.name} @ {v_Pos:F2}");
+            GetItemsAsString(v_Player, sb);
+        }
+
+        sb.AppendLine();
+        sb.AppendLine("IAs:");
+        foreach (var ai in GameManager.Instance.GetAIObjects())
+        {
+            if (ai != null)
+                sb.AppendLine($"- {ai.name} @ {ai.transform.position:F2}");
+        }
+
+        return sb.ToString();
+
+        void GetItemsAsString(Player p_Player, StringBuilder sb)
+        {
+            var v_Inventory = p_Player.GetComponent<PlayerInventory>();
+
 
             if (v_Inventory != null && v_Inventory.GetInventory().Count > 0)
             {
                 foreach (var v_Item in v_Inventory.GetInventory())
                 {
-                    sb.AppendLine($"    - {v_Item.Name}  (id: {v_Item.Id})");
+                    sb.AppendLine($"    - {v_Item.Name}  (global id: {v_Item.GlobalId}, unique id: {v_Item.UniqueId})");
 
                     // 💡 Afficher les stats détaillées de l’item
                     foreach (var v_Stat in v_Item.Stats)
@@ -72,16 +90,6 @@ public class DebugUI : MonoBehaviour
                 sb.AppendLine("    (aucun item)");
             }
         }
-
-        sb.AppendLine();
-        sb.AppendLine("IAs:");
-        foreach (var ai in GameManager.Instance.GetAIObjects())
-        {
-            if (ai != null)
-                sb.AppendLine($"- {ai.name} @ {ai.transform.position:F2}");
-        }
-
-        return sb.ToString();
     }
 
     void UpdateFpsCounter()

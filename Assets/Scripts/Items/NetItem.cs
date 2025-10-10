@@ -3,16 +3,16 @@ using Unity.Netcode;
 
 public struct NetItem : INetworkSerializable, System.IEquatable<NetItem>
 {
-    public int ItemId;
     public FixedString64Bytes Name;
-    public FixedString64Bytes Id;
+    public int UniqueId;
+    public FixedString64Bytes GlobalId;
     public FixedList128Bytes<ItemStat> Stats;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        serializer.SerializeValue(ref ItemId);
+        serializer.SerializeValue(ref UniqueId);
         serializer.SerializeValue(ref Name);
-        serializer.SerializeValue(ref Id);
+        serializer.SerializeValue(ref GlobalId);
 
         // 👇 Sérialisation manuelle de la FixedList
         int count = Stats.Length;
@@ -41,7 +41,7 @@ public struct NetItem : INetworkSerializable, System.IEquatable<NetItem>
 
     public bool Equals(NetItem other)
     {
-        if (ItemId != other.ItemId) return false;
+        if (UniqueId != other.UniqueId) return false;
         if (!Name.Equals(other.Name)) return false;
         if (Stats.Length != other.Stats.Length) return false;
         for (int i = 0; i < Stats.Length; i++)

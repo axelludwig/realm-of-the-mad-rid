@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: CouteauRouille
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   ItemName: "Couteau rouill\xE9"
-  ItemId: couteau-rouille
+  ItemGlobalId: couteau-rouille
   Rarity: 0
   StatBonuses:
   - StatType: 3

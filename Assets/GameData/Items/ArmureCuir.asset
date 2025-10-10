@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ArmureCuir
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   ItemName: Armure de cuir
-  ItemId: armure-cuir
+  ItemGlobalId: armure-cuir
   Rarity: 0
   StatBonuses:
   - StatType: 0

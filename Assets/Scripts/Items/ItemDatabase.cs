@@ -13,7 +13,7 @@ public class ItemDatabase : ScriptableObject
     {
         foreach (var v_Item in AllItems)
         {
-            if (v_Item.ItemId == p_Id)
+            if (v_Item.ItemGlobalId == p_Id)
                 return v_Item;
         }
         Debug.LogWarning($"Item introuvable dans la database : {p_Id}");

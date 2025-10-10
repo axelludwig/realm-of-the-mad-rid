@@ -32,8 +32,6 @@ public class GameManager : BaseSingleton<GameManager>
     {
         if (!PlayersIds.Contains(clientId))
             PlayersIds.Add(clientId);
-
-        //GiveStarterItemToPlayer(clientId);
     }
 
     private void OnClientDisconnected(ulong clientId)
