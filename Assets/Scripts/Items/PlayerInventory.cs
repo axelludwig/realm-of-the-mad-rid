@@ -1,50 +1,89 @@
-﻿using System.Collections.Generic;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
+using System.Linq;
+using System.Collections.Generic;
 
 public class PlayerInventory : NetworkBehaviour
 {
-    private List<ItemInstance> _items = new();
+    private  NetworkList<NetItem> _items = new NetworkList<NetItem>(
+            readPerm: NetworkVariableReadPermission.Everyone,
+            writePerm: NetworkVariableWritePermission.Server);
 
-    public IReadOnlyList<ItemInstance> Items => _items;
+    public NetworkList<NetItem> GetInventory() => _items;
 
-    /// <summary>
-    /// Appelé côté client pour demander un item au serveur.
-    /// </summary>
-    public void RequestItem(string p_ItemName)
+    public override void OnNetworkSpawn()
     {
-        if (!IsOwner) return; // sécurité
-        RequestItemServerRpc(p_ItemName);
+        if (IsClient)
+            _items.OnListChanged += OnInventoryChanged;
     }
 
-    /// <summary>
-    /// Exécuté sur le serveur quand un client demande un item.
-    /// </summary>
+    public override void OnNetworkDespawn()
+    {
+        if (_items != null)
+            _items.OnListChanged -= OnInventoryChanged;
+    }
+
+    private void OnInventoryChanged(NetworkListEvent<NetItem> e)
+    {
+        Debug.Log($"Inventaire maj pour {OwnerClientId} : {_items.Count} items");
+        // -> mettre à jour l’UI ici
+    }
+
     [ServerRpc]
-    private void RequestItemServerRpc(string p_ItemName, ServerRpcParams p_Params = default)
+    public void AddItemServerRpc(string p_ItemName)
     {
-        ulong v_SenderClientId = p_Params.Receive.SenderClientId;
-
-        var v_ItemData = ItemManager.Instance.GenerateNetworkItem(p_ItemName);
-
-        // Envoie le résultat à tous les clients, avec l’ID du destinataire
-        GiveItemClientRpc(v_ItemData, v_SenderClientId);
+        AddItemInternal(p_ItemName);
     }
 
     /// <summary>
-    /// Reçoit l’item côté client.
+    /// Ajoute un item à l’inventaire du joueur.
     /// </summary>
-    [ClientRpc]
-    public void GiveItemClientRpc(ItemNetworkData p_ItemData, ulong p_ClientId)
+    /// <param name="p_ItemName"></param>
+    public void AddItemInternal(string p_ItemName)
     {
-        // Vérifie que c’est bien nous
-        if (NetworkManager.Singleton.LocalClientId != p_ClientId)
+        if (!IsServer)
+        {
+            Debug.LogWarning("AddItemInternal doit être appelé côté serveur !");
             return;
+        }
 
-        var v_Item = ItemInstance.FromNetworkData(p_ItemData, ItemManager.Instance.GetDatabase());
-        if (v_Item != null)
-            _items.Add(v_Item);
+        if (!IsSpawned)
+        {
+            Debug.LogWarning($"Tentative d’ajouter un item avant le spawn du NetworkObject (Player {OwnerClientId})");
+            return;
+        }
 
-        Debug.Log($"🎁 Joueur {p_ClientId} a reçu {v_Item}");
+
+        var db = ItemManager.Instance.GetDatabase();
+        var item = ItemManager.Instance.GenerateItemByName(p_ItemName);
+        if (item == null) return;
+
+        NetItem ni = default;
+        ni.ItemId = GetItemId(item.Data);
+        ni.Name = item.Data.ItemName;
+
+        var ordered = item.FinalStats.OrderBy(k => k.Key);
+        foreach (var kv in ordered)
+        {
+            if (ni.Stats.Length < ni.Stats.Capacity)
+                ni.Stats.Add(new ItemStat { Type = kv.Key, Value = kv.Value });
+            else
+                Debug.LogWarning($"Trop de stats pour l’item {p_ItemName} (capacité FixedList atteinte).");
+        }
+
+        Debug.Log($"[{name}] AddItemInternal pour joueur {OwnerClientId}, " +
+          $"IsSpawned={IsSpawned}, NetworkObject.IsSpawned={NetworkObject.IsSpawned}, " +
+          $"IsServer={IsServer}, NetworkManager.Singleton.IsServer={NetworkManager.Singleton.IsServer}");
+
+
+        _items.Add(ni);
+    }
+
+    private int GetItemId(ItemData data)
+    {
+        var db = ItemManager.Instance.GetDatabase();
+        for (int i = 0; i < db.AllItems.Length; i++)
+            if (db.AllItems[i] == data) return i;
+        return -1;
     }
 }

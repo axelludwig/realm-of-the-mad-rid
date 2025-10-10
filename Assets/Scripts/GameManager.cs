@@ -33,41 +33,13 @@ public class GameManager : BaseSingleton<GameManager>
         if (!PlayersIds.Contains(clientId))
             PlayersIds.Add(clientId);
 
-        GiveStarterItemToPlayer(clientId);
+        //GiveStarterItemToPlayer(clientId);
     }
 
     private void OnClientDisconnected(ulong clientId)
     {
         if (PlayersIds.Contains(clientId))
             PlayersIds.Remove(clientId);
-    }
-
-    /// <summary>
-    /// Donne un item de départ ("Couteau rouillé") au joueur à la connexion.
-    /// </summary>
-    private void GiveStarterItemToPlayer(ulong p_ClientId)
-    {
-        GameObject v_Player = GetPlayerByClientId(p_ClientId);
-        if (v_Player == null)
-        {
-            Debug.LogWarning($"Impossible de donner un item : joueur {p_ClientId} introuvable.");
-            return;
-        }
-
-        PlayerInventory v_Inventory = v_Player.GetComponent<PlayerInventory>();
-        if (v_Inventory == null)
-        {
-            Debug.LogWarning($"Le joueur {p_ClientId} n’a pas de PlayerInventory !");
-            return;
-        }
-
-        // ✅ Génère l’item côté serveur
-        var v_ItemData = ItemManager.Instance.GenerateNetworkItem("Couteau rouillé");
-
-        // ✅ Donne-le au joueur via son ClientRpc
-        v_Inventory.GiveItemClientRpc(v_ItemData, p_ClientId);
-
-        Debug.Log($"🗡️ Donné 'Couteau rouillé' au joueur {p_ClientId}");
     }
 
     /// <summary>

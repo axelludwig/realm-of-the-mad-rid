@@ -13,7 +13,7 @@ public class DebugUI : MonoBehaviour
         UpdateFpsCounter();
 
         StringBuilder debugText = new StringBuilder();
-        debugText.AppendLine("Menu de debug de chiasse 💩");
+        debugText.AppendLine("Menu de debug de chiasse");
         debugText.AppendLine($"{fps} fps");
         debugText.AppendLine();
         debugText.AppendLine(GetConnectedPlayersAsString());
@@ -37,16 +37,16 @@ public class DebugUI : MonoBehaviour
 
             sb.AppendLine($"- {v_Player.name} @ {v_Pos:F2}");
 
-            if (v_Inventory != null && v_Inventory.Items.Count > 0)
+            if (v_Inventory != null && v_Inventory.GetInventory().Count > 0)
             {
-                foreach (var v_Item in v_Inventory.Items)
+                foreach (var v_Item in v_Inventory.GetInventory())
                 {
-                    sb.AppendLine($"    - {v_Item.Data.ItemName}");
+                    sb.AppendLine($"    - {v_Item.Name}");
 
                     // 💡 Afficher les stats détaillées de l’item
-                    foreach (var v_Stat in v_Item.FinalStats)
+                    foreach (var v_Stat in v_Item.Stats)
                     {
-                        sb.AppendLine($"        {v_Stat.Key}: +{v_Stat.Value:F1}");
+                        sb.AppendLine($"        {v_Stat.Type}: +{v_Stat.Value:F1}");
                     }
                 }
             }

@@ -28,13 +28,4 @@ public class ItemManager : BaseSingleton<ItemManager>
 
         return new ItemInstance(v_ItemData);
     }
-
-    /// <summary>
-    /// Génère un item et le renvoie sous forme de données réseau.
-    /// </summary>
-    public ItemNetworkData GenerateNetworkItem(string p_ItemName)
-    {
-        var v_Instance = GenerateItemByName(p_ItemName);
-        return v_Instance?.ToNetworkData() ?? default;
-    }
 }

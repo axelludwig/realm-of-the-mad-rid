@@ -27,9 +27,7 @@ public class LootBag : NetworkBehaviour
         // ✅ Donne tous les items
         foreach (var v_ItemName in ItemNames)
         {
-            var v_ItemData = ItemManager.Instance.GenerateNetworkItem(v_ItemName);
-            v_Inventory.GiveItemClientRpc(v_ItemData, v_Inventory.OwnerClientId);
-            Debug.Log($"💰 {v_ItemName} ramassé par le joueur {v_Inventory.OwnerClientId}");
+            v_Inventory.AddItemInternal(v_ItemName);
         }
 
         IsLooted = true;
@@ -57,15 +55,6 @@ public class LootBag : NetworkBehaviour
         yield return new WaitForSeconds(p_Delay);
         IsLooted = false;
         gameObject.SetActive(true);
-    }
-
-    /// <summary>
-    /// Permet d’ajouter dynamiquement un item dans le loot (avant spawn).
-    /// </summary>
-    public void AddItem(string p_ItemName)
-    {
-        if (!ItemNames.Contains(p_ItemName))
-            ItemNames.Add(p_ItemName);
     }
 
     /// <summary>
