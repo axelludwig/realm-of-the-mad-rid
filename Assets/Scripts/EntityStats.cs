@@ -19,7 +19,7 @@ public class EntityStats
     public Stat Armour { get; private set; }
 
     /// <summary>
-    /// Vitesse de move speed, 1 par défaut
+    /// Vitesse de move speed, 5 par défaut
     /// </summary>
     public Stat MovementSpeed { get; private set; }
 
@@ -43,15 +43,29 @@ public class EntityStats
     /// </summary>
     public Stat CooldownReduction { get; private set; }
 
-    public EntityStats()
+    /// <summary>
+    /// Rayon de l'aura du joueur. Détermine à quelle distance l'xp est partagée, et sûrement d'autres trucs qu'on implémentera un jour (50 par défaut).
+    /// </summary>
+    public Stat AuraRadius { get; private set; }
+
+    public EntityStats(
+        float health = 100,
+        float armour = 0,
+        float moveSpeed = 5,
+        float attackSpeed = 1,
+        float strength = 0,
+        float intelligence = 0,
+        float cooldownReduction = 0,
+        float auraRadius = 50)
     {
-        Health = new Stat(100);
-        Armour = new Stat(0);
-        MovementSpeed = new Stat(5);
-        AttackSpeed = new Stat(1);
-        Strength = new Stat(0);
-        Intelligence = new Stat(0);
-        CooldownReduction = new Stat(0);
+        Health = new Stat(health);
+        Armour = new Stat(armour);
+        MovementSpeed = new Stat(moveSpeed);
+        AttackSpeed = new Stat(attackSpeed);
+        Strength = new Stat(strength);
+        Intelligence = new Stat(intelligence);
+        CooldownReduction = new Stat(cooldownReduction);
+        AuraRadius = new Stat(auraRadius);
     }
 
 }

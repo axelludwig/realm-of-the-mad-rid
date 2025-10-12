@@ -91,17 +91,41 @@ public class Entity : NetworkBehaviour
 
     public void Die(ulong killerId)
     {
+        if (!IsServer) return;
+
         var killer = GameManager.Instance.GetPlayerByClientId(killerId);
         if (killer != null)
         {
             var playerEntity = killer.GetComponent<Entity>();
-            if (playerEntity) playerEntity.GainXP(Experience.GetXPGivenOnDeath());
+            if (playerEntity)
+            {
+                int xpToGive = Experience.GetXPGivenOnDeath();
+                float killerAuraRadius = playerEntity.Stats.AuraRadius.CurrentValue;
+                Collider2D[] hits = Physics2D.OverlapCircleAll(playerEntity.transform.position, killerAuraRadius);
+
+                foreach (var hit in hits)
+                {
+                    var entity = hit.GetComponent<Entity>();
+                    if (entity != null && entity.CompareTag("Player"))
+                    {
+                        entity.GainXP(xpToGive);
+                        Debug.Log($"- {entity.gameObject.name} gagne {xpToGive} XP (ennemi tué par {killer.name})");
+                    }
+                }
+            }
         }
 
         if (IsServer)
         {
             GetComponent<NetworkObject>().Despawn();
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (Stats == null) return;
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, Stats.AuraRadius.CurrentValue);
     }
 
     public void GainXP(int xp)

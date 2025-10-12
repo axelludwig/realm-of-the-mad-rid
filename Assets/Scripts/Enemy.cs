@@ -7,6 +7,15 @@ public class Enemy: Entity
     private float v_Speed = 3f;
     private Transform v_Target;
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+        Stats = new EntityStats(
+            health: 25
+        );
+    }
+
     private void Update()
     {
         // Seul le serveur contrôle le déplacement
