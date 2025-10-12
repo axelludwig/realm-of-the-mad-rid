@@ -6,6 +6,8 @@ public class PlayerMovement : NetworkBehaviour
 {
     private Vector2 v_MoveInput;
     private Entity entity;
+    private PlayerInput input;
+
     [SerializeField] private GameObject ProjectilePrefab;
     [SerializeField] private GameObject EnemyPrefab;
 
@@ -14,11 +16,24 @@ public class PlayerMovement : NetworkBehaviour
 
     private Camera Camera;
 
+    void Awake()
+    {
+        input = GetComponent<PlayerInput>();
+    }
+
     private void Start()
     {
         entity = GetComponent<Entity>();
         if (IsOwner)
             Camera = Camera.main;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (!IsOwner && input != null)
+        {
+            input.enabled = false; // désactive les inputs sur les autres clients pour éviter le bug paranormal que y'a que moi qui a
+        }
     }
 
     private void Update()
