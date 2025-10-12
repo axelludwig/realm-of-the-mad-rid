@@ -8,6 +8,9 @@ public class NetworkStartUI : MonoBehaviour
         float w = 200f, h = 40f;
         float x = 10f, y = 10f;
 
+        if (NetworkManager.Singleton == null)
+            return;
+
         if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
         {
             if (GUI.Button(new Rect(x, y, w, h), "Host")) NetworkManager.Singleton.StartHost();

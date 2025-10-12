@@ -47,7 +47,7 @@ public class EntityStats
     {
         Health = new Stat(100);
         Armour = new Stat(0);
-        MovementSpeed = new Stat(1);
+        MovementSpeed = new Stat(5);
         AttackSpeed = new Stat(1);
         Strength = new Stat(0);
         Intelligence = new Stat(0);

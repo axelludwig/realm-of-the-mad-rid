@@ -31,8 +31,8 @@ public class Projectile : NetworkBehaviour
         if(entity != null)
         {
             entity.TakeDamageServerRpc(10, OwnerClientId);
+            DestroyProjectileServerRpc();
         }
-        DestroyProjectileServerRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]

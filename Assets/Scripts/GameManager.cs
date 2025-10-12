@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class GameManager : BaseSingleton<GameManager>
 {
-    [SerializeField] private GameObject v_EnemyPrefab;
+    [SerializeField] private GameObject EnemyPrefab;
+    [SerializeField] private GameObject LootBagPrefab;
 
     // ✅ Instanciation directe (obligatoire pour Netcode)
     public NetworkList<ulong> PlayersIds = new();
@@ -21,6 +22,9 @@ public class GameManager : BaseSingleton<GameManager>
 
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
+
+            SpawnLoot("armure-cuir", new Vector3(3f, 3f, 0f));
+            SpawnLoot("couteau-rouille", new Vector3(3f, -3f, 0f));
         }
     }
 
@@ -37,16 +41,44 @@ public class GameManager : BaseSingleton<GameManager>
     }
 
     /// <summary>
+    /// Récupère le GameObject du joueur associé à un ClientId Netcode.
+    /// </summary>
+    public GameObject GetPlayerByClientId(ulong p_ClientId)
+    {
+        NetworkObject v_PlayerObject = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(p_ClientId);
+
+        if (v_PlayerObject == null)
+        {
+            Debug.LogWarning($"❌ Aucun joueur trouvé pour le clientId {p_ClientId}");
+            return null;
+        }
+
+        return v_PlayerObject.gameObject;
+    }
+
+    /// <summary>
     /// Fait apparaître une IA sur le serveur à une position donnée.
     /// </summary>
     [ServerRpc(RequireOwnership = false)]
     public void SpawnEnemyServerRpc(Vector2 p_Pos)
     {
-        GameObject v_Enemy = Instantiate(v_EnemyPrefab, p_Pos, Quaternion.identity);
+        GameObject v_Enemy = Instantiate(EnemyPrefab, p_Pos, Quaternion.identity);
         var v_NetObj = v_Enemy.GetComponent<NetworkObject>();
         v_NetObj.Spawn(true);
 
         AIIds.Add(v_NetObj.NetworkObjectId);
+    }
+
+    private void SpawnLoot(string p_itemId, Vector2 p_Pos)
+    {
+        GameObject v_Loot = Instantiate(LootBagPrefab, p_Pos, Quaternion.identity);
+        LootBag v_LootBag = v_Loot.GetComponent<LootBag>();
+
+        // ✅ Exemple : plusieurs équipements dans le même loot
+        v_LootBag.SetItems(new List<string> { p_itemId });
+
+        v_Loot.GetComponent<NetworkObject>().Spawn(true);
+        Debug.Log("💰 LootBag multi-items spawnée au sol !");
     }
 
     /// <summary>
@@ -54,6 +86,9 @@ public class GameManager : BaseSingleton<GameManager>
     /// </summary>
     public List<Player> GetPlayerObjects()
     {
+        if (NetworkManager.Singleton == null)
+            return new List<Player>();
+
         List<Player> v_Result = new();
 
         foreach (ulong v_ClientId in PlayersIds)
