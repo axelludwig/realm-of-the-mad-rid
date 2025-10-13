@@ -22,18 +22,18 @@ public class ServerMapManager : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (!IsServer) { enabled = false; return; }
+        if (!IsServer)
+        {
+            enabled = false;
+            return;
+        }
 
-        // ✅ Quand un nouveau client se connecte, envoie-lui la région (0,0)
+        Debug.Log("🌐 Serveur prêt à envoyer les régions !");
         NetworkManager.Singleton.OnClientConnectedCallback += clientId =>
         {
+            Debug.Log($"👋 Client {clientId} connecté !");
             StartCoroutine(SendAllRegionsToClient(clientId));
-            Debug.Log($"👋 Nouveau client connecté : {clientId}, envoi de toutes les régions sauvegardées.");
-            Debug.Log($"🌍 Serveur a actuellement {_regions.Count} régions en mémoire.");
-            Debug.Log("Liste des régions envoyées : " + string.Join(", ", _regions.Keys.Select(r => r.ToString())));
         };
-
-        Debug.Log("🌐 Serveur prêt !");
     }
 
     private IEnumerator SendAllRegionsToClient(ulong clientId)
@@ -96,14 +96,24 @@ public class ServerMapManager : NetworkBehaviour
         );
     }
 
-
-
     [ServerRpc(RequireOwnership = false)]
     public void RequestRegionServerRpc(Vector2Int region, ServerRpcParams rpcParams = default)
     {
-        var sender = rpcParams.Receive.SenderClientId;
-        Debug.Log($"📥 Serveur a reçu une requête pour la région {region} du client {sender}");
-        SendRegionToClient(sender, region);
+        ulong senderId = rpcParams.Receive.SenderClientId;
+
+        if (!_regions.ContainsKey(region))
+        {
+            Debug.Log($"🧱 Région {region} absente — génération côté serveur !");
+            var data = MapGenerator.GenerateRegion(region);
+            _regions[region] = data;
+            MapSerializer.SaveRegion(region, data);
+        }
+        else
+        {
+            Debug.Log($"📦 Région {region} déjà en mémoire — envoi direct.");
+        }
+
+        SendRegionToClient(senderId, region);
     }
 
     public void SaveAllRegions()

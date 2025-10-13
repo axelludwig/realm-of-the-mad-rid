@@ -943,7 +943,7 @@ MonoBehaviour:
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
     Address: 127.0.0.1
-    Port: 7778
+    Port: 7779
     ServerListenAddress: 127.0.0.1
   DebugSimulator:
     PacketDelayMS: 0

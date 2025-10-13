@@ -29,16 +29,16 @@ public class ClientMapRenderer : MonoBehaviour
 
     private void OnReceiveRegion(ulong clientId, FastBufferReader reader)
     {
-        Debug.Log($"📦 Message 'ReceiveRegion' reçu du serveur !");
+        //Debug.Log($"📦 Message 'ReceiveRegion' reçu du serveur !");
         var msg = RegionMessage.FromReader(reader);
-        Debug.Log($"🧩 Région {msg.region} reçue avec {Utils.SafeCount(msg.tiles)} tiles");
+        //Debug.Log($"🧩 Région {msg.region} reçue avec {Utils.SafeCount(msg.tiles)} tiles");
         RenderRegion(msg);
     }
 
 
     private void RenderRegion(RegionMessage msg)
     {
-        Debug.Log($"🎨 Début du rendu région {msg.region}");
+        //Debug.Log($"🎨 Début du rendu région {msg.region}");
 
         if (!_regionTilemaps.TryGetValue(msg.region, out var tilemap))
         {
@@ -49,15 +49,15 @@ public class ClientMapRenderer : MonoBehaviour
             tilemap = regionObj.GetComponentInChildren<Tilemap>();
             _regionTilemaps[msg.region] = tilemap;
 
-            Debug.Log($"🧱 Nouveau tilemap instancié pour région {msg.region} à position {worldPos}");
+            //Debug.Log($"🧱 Nouveau tilemap instancié pour région {msg.region} à position {worldPos}");
         }
 
-        Debug.Log($"🧱 Effacement de l'ancien contenu...");
+        //Debug.Log($"🧱 Effacement de l'ancien contenu...");
         tilemap.ClearAllTiles();
 
         if (msg.tiles == null)
         {
-            Debug.LogWarning($"⚠️ msg.tiles est null pour région {msg.region}");
+            //Debug.LogWarning($"⚠️ msg.tiles est null pour région {msg.region}");
             return;
         }
 
@@ -66,7 +66,7 @@ public class ClientMapRenderer : MonoBehaviour
             var tile = tileRegistry != null ? tileRegistry.Get(t.tileId) : null;
             if (tile == null)
             {
-                Debug.LogWarning($"❌ tileId {t.tileId} introuvable dans tileRegistry");
+                //Debug.LogWarning($"❌ tileId {t.tileId} introuvable dans tileRegistry");
                 continue;
             }
 
@@ -76,7 +76,7 @@ public class ClientMapRenderer : MonoBehaviour
             tilemap.SetTile(cell, tile);
         }
 
-        Debug.Log($"✅ Fin du rendu région {msg.region} ({msg.tiles.Count()} tiles placées)");
+        //Debug.Log($"✅ Fin du rendu région {msg.region} ({msg.tiles.Count()} tiles placées)");
     }
 
 }
