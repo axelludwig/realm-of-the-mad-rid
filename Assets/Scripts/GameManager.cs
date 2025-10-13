@@ -113,6 +113,9 @@ public class GameManager : BaseSingleton<GameManager>
     /// </summary>
     public List<Enemy> GetAIObjects()
     {
+        if (NetworkManager.Singleton == null)
+            return new List<Enemy>();
+
         List<Enemy> v_Result = new();
 
         foreach (ulong v_ObjId in AIIds)
