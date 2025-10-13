@@ -2,26 +2,27 @@ using UnityEngine;
 
 public class Experience
 {
+    private Entity entity;
+
     private int experiencePoints;
     private int level;
-    private int experienceForNextLevel;
 
     public int ExperiencePoints => experiencePoints;
     public int Level => level;
-    public int ExperienceForNextLevel => experienceForNextLevel;
+    public int ExperienceForNextLevel => GetXPNeededForNextLevel();
 
-    public Experience()
+    public Experience(Entity entity)
     {
         experiencePoints = 0;
         level = 1;
-        experienceForNextLevel = 50;
+        this.entity = entity;
     }
 
     public void GainXP(int xp)
     {
         experiencePoints += xp;
 
-        while(experiencePoints >= experienceForNextLevel)
+        while(experiencePoints >= GetXPNeededForNextLevel())
         {
             GainLevel();
         }
@@ -55,13 +56,15 @@ public class Experience
 
     private void GainLevel()
     {
-        experiencePoints -= experienceForNextLevel;
+        experiencePoints -= GetXPNeededForNextLevel();
         level = level + 1;
-        experienceForNextLevel = GetXPNeededForNextLevel();
     }
 
-    private int GetXPNeededForNextLevel()
+    public int GetXPNeededForNextLevel()
     {
+        if (level == 1)
+            return 50;
+
         return (level * 50 * level/2);
     }
 }

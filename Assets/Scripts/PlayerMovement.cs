@@ -99,7 +99,7 @@ public class PlayerMovement : NetworkBehaviour
     private void SpawnProjectileServerRpc(Vector3 p_Position, Vector2 p_Direction)
     {
         GameObject v_Projectile = Instantiate(ProjectilePrefab, p_Position, Quaternion.identity);
-        v_Projectile.GetComponent<Projectile>().Initialize(p_Direction);
+        v_Projectile.GetComponent<Projectile>().Initialize(p_Direction, entity);
         v_Projectile.GetComponent<NetworkObject>().Spawn();
     }
 

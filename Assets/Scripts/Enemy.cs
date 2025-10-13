@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Enemy: Entity
 {
-    private float v_Speed = 3f;
     private Transform v_Target;
 
     protected override void Awake()
@@ -12,7 +11,8 @@ public class Enemy: Entity
         base.Awake();
 
         Stats = new EntityStats(
-            health: 25
+            health: 25,
+            moveSpeed: 4
         );
     }
 
@@ -30,7 +30,7 @@ public class Enemy: Entity
 
         // Déplacement vers le joueur
         Vector3 v_Direction = (v_Target.position - transform.position).normalized;
-        transform.position += v_Direction * v_Speed * Time.deltaTime;
+        transform.position += v_Direction * Stats.MovementSpeed.CurrentValue * Time.deltaTime;
     }
 
     /// <summary>

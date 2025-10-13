@@ -15,7 +15,7 @@ public class Entity : NetworkBehaviour
 
     protected virtual void Awake()
     {
-        Experience = new Experience();
+        Experience = new Experience(this);
         Stats = new EntityStats();
 
         NetworkedHealth = new NetworkVariable<float>(
