@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class MapRuntime : MonoBehaviour
+public class MapRuntime : MonoBoule<MapRuntime>
 {
     [Header("Références")]
-    public Transform player;
+    private Transform player;
     public Grid grid;
     public Tilemap groundTilemap;
     public TileBase fallbackGroundTile;
@@ -22,16 +23,23 @@ public class MapRuntime : MonoBehaviour
     private Dictionary<string, MapObjectDefinition> _objById;
     private HashSet<Vector2Int> _loadedRegions = new();
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         _json = MapProvider.LoadFromStreamingAssets();
         _biomeById = new(); foreach (var b in biomes) _biomeById[b.biomeId] = b;
         _objById = new(); foreach (var d in objectDefs) _objById[d.objectId] = d;
         GenerateStaticFromJson();
     }
 
+    public void Init(Player player)
+    {
+        this.player = player.transform;
+    }
+
     void Update()
     {
+        if (!player) return;
         var region = WorldToRegion(player.position);
         for (int ry = -viewRadiusRegions; ry <= viewRadiusRegions; ry++)
         {
