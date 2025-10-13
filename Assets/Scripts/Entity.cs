@@ -110,6 +110,7 @@ public class Entity : NetworkBehaviour
                     {
                         entity.GainXP(xpToGive);
                         Debug.Log($"- {entity.gameObject.name} gagne {xpToGive} XP (ennemi tué par {killer.name})");
+                        break;
                     }
                 }
             }
