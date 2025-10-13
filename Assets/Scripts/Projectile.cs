@@ -6,16 +6,18 @@ public class Projectile : NetworkBehaviour
 {
     private float v_Speed = 10f;
     private float range = 10f;
+    private Entity shooter;
     private Vector3 spawnPosition;
     private Vector2 v_Direction;
 
     /// <summary>
     /// Initialise le projectile avec une direction donnée.
     /// </summary>
-    public void Initialize(Vector2 p_Direction)
+    public void Initialize(Vector2 p_Direction, Entity shooter)
     {
         v_Direction = p_Direction.normalized;
         spawnPosition = transform.position;
+        this.shooter = shooter;
     }
 
     private void Update()
@@ -36,10 +38,12 @@ public class Projectile : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        var entity = other.gameObject.GetComponent<Enemy>();
-        if(entity != null)
+        var targetEntity = other.gameObject.GetComponent<Entity>();
+        var shooterTag = shooter.tag;
+        if (other.CompareTag(shooterTag)) return;
+        if(targetEntity != null)
         {
-            entity.TakeDamageServerRpc(10, OwnerClientId);
+            targetEntity.TakeDamageServerRpc(10, OwnerClientId);
             DestroyProjectileServerRpc();
         }
     }
