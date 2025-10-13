@@ -17,17 +17,18 @@ public class DebugUI : MonoBehaviour
         debugText.AppendLine("Menu de debug de chiasse");
         debugText.AppendLine($"{fps} fps");
         debugText.AppendLine();
-        debugText.AppendLine(GetHealthAndXpAsString());
-        debugText.AppendLine(GetConnectedPlayersAsString());
+
+        if (NetworkManager.Singleton?.SpawnManager != null)
+        {
+            debugText.AppendLine(GetHealthAndXpAsString());
+            debugText.AppendLine(GetConnectedPlayersAsString());
+        }
 
         text.text = debugText.ToString();
     }
 
     string GetHealthAndXpAsString()
     {
-        if (NetworkManager.Singleton == null)
-            return "";
-
         var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
         if (playerObject == null) return "";
         var player = playerObject.GetComponent<Entity>();
