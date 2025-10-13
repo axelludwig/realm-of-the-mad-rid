@@ -5,6 +5,8 @@ using UnityEngine;
 public class Projectile : NetworkBehaviour
 {
     private float v_Speed = 10f;
+    private float range = 10f;
+    private Vector3 spawnPosition;
     private Vector2 v_Direction;
 
     /// <summary>
@@ -13,6 +15,7 @@ public class Projectile : NetworkBehaviour
     public void Initialize(Vector2 p_Direction)
     {
         v_Direction = p_Direction.normalized;
+        spawnPosition = transform.position;
     }
 
     private void Update()
@@ -21,6 +24,12 @@ public class Projectile : NetworkBehaviour
         if (!IsServer) return;
 
         transform.Translate(v_Direction * v_Speed * Time.deltaTime);
+
+        float distanceTravelled = Vector3.Distance(spawnPosition, transform.position);
+        if (distanceTravelled >= range)
+        {
+            DestroyProjectileServerRpc();
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
