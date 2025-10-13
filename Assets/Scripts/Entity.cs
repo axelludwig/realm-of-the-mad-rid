@@ -15,7 +15,7 @@ public class Entity : NetworkBehaviour
 
     protected virtual void Awake()
     {
-        Experience = new Experience(this);
+        Experience = new Experience();
         Stats = new EntityStats();
 
         NetworkedHealth = new NetworkVariable<float>(
@@ -110,7 +110,6 @@ public class Entity : NetworkBehaviour
                     {
                         entity.GainXP(xpToGive);
                         Debug.Log($"- {entity.gameObject.name} gagne {xpToGive} XP (ennemi tué par {killer.name})");
-                        break;
                     }
                 }
             }
