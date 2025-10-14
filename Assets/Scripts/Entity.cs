@@ -7,7 +7,14 @@ public class Entity : NetworkBehaviour
     public Experience Experience;
     public EntityStats Stats;
 
-    public NetworkVariable<float> NetworkedHealth;
+    public NetworkVariable<float> NetworkedHealth = new();
+    public NetworkVariable<float> NetworkedArmour = new();
+    public NetworkVariable<float> NetworkedMovementSpeed = new();
+    public NetworkVariable<float> NetworkedAttackSpeed = new();
+    public NetworkVariable<float> NetworkedStrength = new();
+    public NetworkVariable<float> NetworkedIntelligence = new();
+    public NetworkVariable<float> NetworkedCooldownReduction = new();
+    public NetworkVariable<float> NetworkedAuraRadius = new();
 
     public NetworkVariable<int> NetworkXP;
 
@@ -16,23 +23,71 @@ public class Entity : NetworkBehaviour
     protected virtual void Awake()
     {
         Experience = new Experience();
-        Stats = new EntityStats();
+        Stats = new EntityStats(this);
+
+        #region Initialisation des stats
 
         NetworkedHealth = new NetworkVariable<float>(
             Stats.Health.CurrentValue,
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server
         );
+
+        NetworkedArmour = new NetworkVariable<float>(
+            Stats.Armour.CurrentValue,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        NetworkedMovementSpeed = new NetworkVariable<float>(
+            Stats.MovementSpeed.CurrentValue,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        NetworkedAttackSpeed = new NetworkVariable<float>(
+            Stats.AttackSpeed.CurrentValue,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        NetworkedStrength = new NetworkVariable<float>(
+            Stats.Strength.CurrentValue,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        NetworkedIntelligence = new NetworkVariable<float>(
+            Stats.Intelligence.CurrentValue,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        NetworkedCooldownReduction = new NetworkVariable<float>(
+            Stats.CooldownReduction.CurrentValue,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+        NetworkedAuraRadius = new NetworkVariable<float>(
+            Stats.AuraRadius.CurrentValue,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
         NetworkXP = new NetworkVariable<int>(
             Experience.ExperiencePoints,
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server
         );
+
         NetworkLevel = new NetworkVariable<int>(
             Experience.Level,
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server
         );
+
+        #endregion
 
         if (IsServer)
         {

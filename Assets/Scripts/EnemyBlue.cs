@@ -14,6 +14,7 @@ public class EnemyBlue : Enemy
         base.Awake();
 
         Stats = new EntityStats(
+            this,
             health: 10,
             moveSpeed: 6
         );
