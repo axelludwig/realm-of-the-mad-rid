@@ -22,21 +22,29 @@ public class Stat
         private set => currentValue = Mathf.Clamp(value, 0, MaxValue);
     }
 
-    public Stat(float baseValue, ref NetworkVariable<float> networkVariable)
+    public Stat(float baseValue, NetworkVariable<float> networkVariable)
     {
         this.baseValue = baseValue;
         bonusValue = 0;
         bonusMultiplier = 1f;
         CurrentValue = MaxValue;
-        var v_networkVariable = networkVariable;
 
         OnCurrentValueChanged = () => {
-            v_networkVariable.Value = CurrentValue;
+            networkVariable.Value = CurrentValue;
         };
     }
 
-    public void Decrease(float value) => CurrentValue -= value;
-    public void Increase(float value) => CurrentValue += value;
+    public void Decrease(float value)
+    {
+        CurrentValue -= value;
+        OnCurrentValueChanged();
+    }
+
+    public void Increase(float value)
+    {
+        CurrentValue += value;
+        OnCurrentValueChanged();
+    }
 
     public void AddBonus(float value)
     {
@@ -49,17 +57,20 @@ public class Stat
     {
         bonusValue -= value;
         CurrentValue = Mathf.Clamp(CurrentValue - value, 0, MaxValue);
+        OnCurrentValueChanged();
     }
 
     public void AddMultiplier(float value)
     {
         bonusMultiplier += value;
         CurrentValue = Mathf.Clamp(CurrentValue * (1 + value), 0, MaxValue);
+        OnCurrentValueChanged();
     }
 
     public void RemoveMultiplier(float value)
     {
         bonusMultiplier -= value;
         CurrentValue = Mathf.Clamp(CurrentValue * (1 - value), 0, MaxValue);
+        OnCurrentValueChanged();
     }
 }

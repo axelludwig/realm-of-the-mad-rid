@@ -7,103 +7,82 @@ public class Entity : NetworkBehaviour
     public Experience Experience;
     public EntityStats Stats;
 
-    public NetworkVariable<float> NetworkedHealth = new();
-    public NetworkVariable<float> NetworkedArmour = new();
-    public NetworkVariable<float> NetworkedMovementSpeed = new();
-    public NetworkVariable<float> NetworkedAttackSpeed = new();
-    public NetworkVariable<float> NetworkedStrength = new();
-    public NetworkVariable<float> NetworkedIntelligence = new();
-    public NetworkVariable<float> NetworkedCooldownReduction = new();
-    public NetworkVariable<float> NetworkedAuraRadius = new();
+    #region Init network variable
+
+    public NetworkVariable<float> NetworkedHealth = new NetworkVariable<float>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+    public NetworkVariable<float> NetworkedArmour = new NetworkVariable<float>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+    public NetworkVariable<float> NetworkedMovementSpeed = new NetworkVariable<float>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+    public NetworkVariable<float> NetworkedAttackSpeed = new NetworkVariable<float>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+    public NetworkVariable<float> NetworkedStrength = new NetworkVariable<float>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+    public NetworkVariable<float> NetworkedIntelligence = new NetworkVariable<float>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+    public NetworkVariable<float> NetworkedCooldownReduction = new NetworkVariable<float>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+    public NetworkVariable<float> NetworkedAuraRadius = new NetworkVariable<float>(
+            0,
+            NetworkVariableReadPermission.Everyone,
+            NetworkVariableWritePermission.Server
+        );
+
+    #endregion
 
     public NetworkVariable<int> NetworkXP;
 
     public NetworkVariable<int> NetworkLevel;
 
-    protected virtual void Awake()
-    {
-        Experience = new Experience();
-        Stats = new EntityStats(this);
-
-        #region Initialisation des stats
-
-        NetworkedHealth = new NetworkVariable<float>(
-            Stats.Health.CurrentValue,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
-
-        NetworkedArmour = new NetworkVariable<float>(
-            Stats.Armour.CurrentValue,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
-
-        NetworkedMovementSpeed = new NetworkVariable<float>(
-            Stats.MovementSpeed.CurrentValue,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
-
-        NetworkedAttackSpeed = new NetworkVariable<float>(
-            Stats.AttackSpeed.CurrentValue,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
-
-        NetworkedStrength = new NetworkVariable<float>(
-            Stats.Strength.CurrentValue,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
-
-        NetworkedIntelligence = new NetworkVariable<float>(
-            Stats.Intelligence.CurrentValue,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
-
-        NetworkedCooldownReduction = new NetworkVariable<float>(
-            Stats.CooldownReduction.CurrentValue,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
-
-        NetworkedAuraRadius = new NetworkVariable<float>(
-            Stats.AuraRadius.CurrentValue,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
-
-        NetworkXP = new NetworkVariable<int>(
-            Experience.ExperiencePoints,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
-
-        NetworkLevel = new NetworkVariable<int>(
-            Experience.Level,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server
-        );
-
-        #endregion
-
-        if (IsServer)
-        {
-            NetworkXP.Value = Experience.ExperiencePoints;
-            NetworkLevel.Value = Experience.Level;
-        }
-    }
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+
+        Experience = new Experience();
+
+        if (IsServer)
+        {
+            NetworkedHealth.Value = Stats.Health.CurrentValue;
+            NetworkedArmour.Value = Stats.Armour.CurrentValue;
+            NetworkedMovementSpeed.Value = Stats.MovementSpeed.CurrentValue;
+            NetworkedAttackSpeed.Value = Stats.AttackSpeed.CurrentValue;
+            NetworkedStrength.Value = Stats.Strength.CurrentValue;
+            NetworkedIntelligence.Value = Stats.Intelligence.CurrentValue;
+            NetworkedCooldownReduction.Value = Stats.CooldownReduction.CurrentValue;
+            NetworkedAuraRadius.Value = Stats.AuraRadius.CurrentValue;
+
+            NetworkXP.Value = Experience.ExperiencePoints;
+            NetworkLevel.Value = Experience.Level;
+        }
+
 
         healthBar = GetComponentInChildren<FloatingHealthBar>();
 
         NetworkedHealth.OnValueChanged += (oldValue, newValue) =>
         {
+            Debug.Log("Inside networked health on value changed");
             if (healthBar != null)
                 healthBar.UpdateHealthBar(newValue / Stats.Health.MaxValue);
         };
@@ -123,14 +102,13 @@ public class Entity : NetworkBehaviour
         healthBar?.UpdateHealthBar(NetworkedHealth.Value / Stats.Health.MaxValue);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void TakeDamageServerRpc(float rawDamage, ulong dealerId)
     {
         float armorDamageMultiplier = 1f / (1f + Stats.Armour.CurrentValue / Stats.Health.CurrentValue);
         float valueAfterArmourReduction = rawDamage * armorDamageMultiplier;
 
         Stats.Health.Decrease(valueAfterArmourReduction);
-        NetworkedHealth.Value = Stats.Health.CurrentValue;
         if (Stats.Health.CurrentValue <= 0) Die(dealerId);
     }
 

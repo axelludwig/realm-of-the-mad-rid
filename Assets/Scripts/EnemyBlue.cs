@@ -9,15 +9,15 @@ public class EnemyBlue : Enemy
     private float nextFireTime = 0f;
 
     [SerializeField] private GameObject projectilePrefab;
-    protected override void Awake()
-    {
-        base.Awake();
 
+    public override void OnNetworkSpawn()
+    {
         Stats = new EntityStats(
             this,
             health: 10,
             moveSpeed: 6
         );
+        base.OnNetworkSpawn();
     }
 
     private void Update()

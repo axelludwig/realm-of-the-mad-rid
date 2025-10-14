@@ -2,19 +2,13 @@ using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Enemy: Entity
+public class Enemy : Entity
 {
     private Transform v_Target;
 
-    protected override void Awake()
+    public override void OnNetworkSpawn()
     {
-        base.Awake();
-
-        Stats = new EntityStats(
-            this,
-            health: 25,
-            moveSpeed: 4
-        );
+        base.OnNetworkSpawn();
     }
 
     private void Update()
