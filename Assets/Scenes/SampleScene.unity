@@ -691,7 +691,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   ShowTopMostFoldoutHeaderGroup: 1
-  EnemyPrefab: {fileID: 4434351592986436743, guid: 0642ad2ec68e50a41b29a68331b273a2, type: 3}
+  EnemyPrefab: {fileID: 4434351592986436743, guid: 964575d1bc6671848a30280d084375ba, type: 3}
+  EnemyBluePrefab: {fileID: 4434351592986436743, guid: 0642ad2ec68e50a41b29a68331b273a2, type: 3}
   LootBagPrefab: {fileID: 1740058930213913262, guid: 913fb25d0e609e347899eddbd236be7e, type: 3}
 --- !u!4 &772383146
 Transform:

@@ -92,7 +92,7 @@ public class PlayerMovement : NetworkBehaviour
         Vector3 v_MouseWorld = Camera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         v_MouseWorld.z = 0;
 
-        GameManager.Instance.SpawnEnemyServerRpc(v_MouseWorld);
+        GameManager.Instance.SpawnEnemyGroupServerRpc(v_MouseWorld);
     }
 
     [ServerRpc]

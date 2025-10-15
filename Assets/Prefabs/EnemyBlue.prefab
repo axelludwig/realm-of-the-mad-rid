@@ -193,7 +193,7 @@ GameObject:
   - component: {fileID: -4377384606714116142}
   m_Layer: 0
   m_Name: EnemyBlue
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -407,6 +407,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBlue
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkedHealth:
+    m_InternalValue: 0
+  NetworkedArmour:
+    m_InternalValue: 0
+  NetworkedMovementSpeed:
+    m_InternalValue: 0
+  NetworkedAttackSpeed:
+    m_InternalValue: 0
+  NetworkedStrength:
+    m_InternalValue: 0
+  NetworkedIntelligence:
+    m_InternalValue: 0
+  NetworkedCooldownReduction:
+    m_InternalValue: 0
+  NetworkedAuraRadius:
     m_InternalValue: 0
   NetworkXP:
     m_InternalValue: 0

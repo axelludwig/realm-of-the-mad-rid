@@ -12,12 +12,12 @@ public class EnemyBlue : Enemy
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
         Stats = new EntityStats(
             this,
             health: 10,
             moveSpeed: 6
         );
-        base.OnNetworkSpawn();
     }
 
     private void Update()

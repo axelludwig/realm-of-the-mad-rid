@@ -5,11 +5,14 @@ using UnityEngine;
 public class GameManager : BaseSingleton<GameManager>
 {
     [SerializeField] private GameObject EnemyPrefab;
+    [SerializeField] private GameObject EnemyBluePrefab;
     [SerializeField] private GameObject LootBagPrefab;
 
     // ✅ Instanciation directe (obligatoire pour Netcode)
     public NetworkList<ulong> PlayersIds = new();
     public NetworkList<ulong> AIIds = new();
+    public List<List<ulong>> EnemyGroups = new List<List<ulong>>();
+
 
     public override void OnNetworkSpawn()
     {
@@ -22,9 +25,6 @@ public class GameManager : BaseSingleton<GameManager>
 
             NetworkManager.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.OnClientDisconnectCallback += OnClientDisconnected;
-
-            SpawnLoot("armure-cuir", new Vector3(3f, 3f, 0f));
-            SpawnLoot("couteau-rouille", new Vector3(3f, -3f, 0f));
         }
     }
 
@@ -59,14 +59,60 @@ public class GameManager : BaseSingleton<GameManager>
     /// <summary>
     /// Fait apparaître une IA sur le serveur à une position donnée.
     /// </summary>
-    [ServerRpc(RequireOwnership = false)]
-    public void SpawnEnemyServerRpc(Vector2 p_Pos)
+    public ulong SpawnEnemy(GameObject prefab, Vector2 p_Pos)
     {
-        GameObject v_Enemy = Instantiate(EnemyPrefab, p_Pos, Quaternion.identity);
+        GameObject v_Enemy = Instantiate(prefab, p_Pos, Quaternion.identity);
         var v_NetObj = v_Enemy.GetComponent<NetworkObject>();
         v_NetObj.Spawn(true);
 
         AIIds.Add(v_NetObj.NetworkObjectId);
+        return v_NetObj.NetworkObjectId;
+    }
+
+    public void DespawnEnemy(NetworkObject networkEnemy)
+    {
+        var id = networkEnemy.NetworkObjectId;
+        if (AIIds.Contains(id))
+        {
+            //Trouve l'ennemi dans la liste de groupes d'ennemis et le retire
+            for (int i = 0; i < EnemyGroups.Count; i++)
+            {
+                if(EnemyGroups[i].Exists(elem => elem == id))
+                {
+                    EnemyGroups[i].Remove(id);
+                }
+                if(EnemyGroups[i].Count == 0)
+                {
+                    SpawnLoot("couteau-rouille", networkEnemy.transform.position);
+                    EnemyGroups.RemoveAt(i);
+                }
+            }
+            AIIds.Remove(id);
+            networkEnemy.Despawn();
+        }
+    }
+
+    /// <summary>
+    /// Fait apparaître un groupe d'IA sur le serveur à une position donnée.
+    /// </summary>
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnEnemyGroupServerRpc(Vector2 p_Pos)
+    {
+        var enemiesToInstantiate = new List<GameObject>();
+        enemiesToInstantiate.Add(EnemyPrefab);
+        enemiesToInstantiate.Add(EnemyPrefab);
+        enemiesToInstantiate.Add(EnemyBluePrefab);
+
+        var enemyGroup = new List<ulong>();
+        for (int i = 0; i < enemiesToInstantiate.Count; i++)
+        {
+            Vector2 spawnPos = new Vector2(p_Pos.x, p_Pos.y);
+            spawnPos.x += i;
+            spawnPos.y += i;
+            enemyGroup.Add(SpawnEnemy(enemiesToInstantiate[i], spawnPos));
+        }
+
+        EnemyGroups.Add(enemyGroup);
     }
 
     private void SpawnLoot(string p_itemId, Vector2 p_Pos)
@@ -120,14 +166,21 @@ public class GameManager : BaseSingleton<GameManager>
 
         foreach (ulong v_ObjId in AIIds)
         {
-            if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(v_ObjId, out var v_Obj))
-            {
-                var v_Enemy = v_Obj.GetComponent<Enemy>();
-                if (v_Enemy != null)
-                    v_Result.Add(v_Enemy);
-            }
+
+            var v_Enemy = GetAIObject(v_ObjId);
+            if (v_Enemy != null)
+                v_Result.Add(v_Enemy);
         }
 
         return v_Result;
+    }
+
+    public Enemy GetAIObject(ulong v_ObjId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(v_ObjId, out var v_Obj))
+        {
+            return v_Obj.GetComponent<Enemy>();
+        }
+        return null;
     }
 }

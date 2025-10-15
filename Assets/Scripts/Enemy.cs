@@ -9,6 +9,11 @@ public class Enemy : Entity
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        Stats = new EntityStats(
+            this,
+            health: 25,
+            moveSpeed: 2.5f
+        );
     }
 
     private void Update()

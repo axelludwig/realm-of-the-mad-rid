@@ -61,6 +61,9 @@ public class Entity : NetworkBehaviour
         base.OnNetworkSpawn();
 
         Experience = new Experience();
+        Stats = new EntityStats(
+            this
+        );
 
         if (IsServer)
         {
@@ -150,7 +153,7 @@ public class Entity : NetworkBehaviour
 
         if (IsServer)
         {
-            GetComponent<NetworkObject>().Despawn();
+            GameManager.Instance.DespawnEnemy(GetComponent<NetworkObject>());
         }
     }
 
