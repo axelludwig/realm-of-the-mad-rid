@@ -18,13 +18,20 @@ public class EquipmentStatRange
 
 public enum StatType
 {
-    Health,
-    Armour,
-    MovementSpeed,
-    AttackSpeed,
-    Strength,
-    Intelligence,
-    CooldownReduction,
-    CritChance,
-    CritDamage
+    HealthFlat,
+    HealthPercent,
+    ArmourFlat,
+    ArmourPercent,
+    MovementSpeedFlat,
+    MovementSpeedPercent,
+    AttackSpeedFlat,
+    AttackSpeedPercent,
+    StrengthFlat,
+    StrengthPercent,
+    IntelligenceFlat,
+    IntelligencePercent,
+    CooldownReductionFlat,
+    CooldownReductionPercent,
+    AuraRadiusFlat,
+    AuraRadiusPercent
 }

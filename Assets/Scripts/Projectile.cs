@@ -43,6 +43,7 @@ public class Projectile : NetworkBehaviour
         if (other.CompareTag(shooterTag)) return;
         if(targetEntity != null)
         {
+            //TODO : appeler DealDamage ?
             targetEntity.TakeDamageServerRpc(10, OwnerClientId);
             DestroyProjectileServerRpc();
         }

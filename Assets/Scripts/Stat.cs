@@ -16,6 +16,7 @@ public class Stat
     Action OnCurrentValueChanged;
 
     public float MaxValue => (baseValue + bonusValue) * bonusMultiplier;
+
     public float CurrentValue
     {
         get => currentValue;

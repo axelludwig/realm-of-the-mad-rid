@@ -16,6 +16,6 @@ MonoBehaviour:
   ItemGlobalId: couteau-rouille
   Rarity: 0
   StatBonuses:
-  - StatType: 3
-    MinValue: 10
-    MaxValue: 15
+  - StatType: 7
+    MinValue: 150
+    MaxValue: 200

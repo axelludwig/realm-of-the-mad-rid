@@ -19,6 +19,6 @@ MonoBehaviour:
   - StatType: 0
     MinValue: 20
     MaxValue: 30
-  - StatType: 1
+  - StatType: 2
     MinValue: 5
     MaxValue: 10
