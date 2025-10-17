@@ -59,14 +59,14 @@ public class EntityStats
         float cooldownReduction = 0,
         float auraRadius = 50)
     {
-        Health = new Stat(health, entity.NetworkedHealth);
-        Armour = new Stat(armour, entity.NetworkedArmour);
-        MovementSpeed = new Stat(moveSpeed, entity.NetworkedMovementSpeed);
-        AttackSpeed = new Stat(attackSpeed, entity.NetworkedAttackSpeed);
-        Strength = new Stat(strength, entity.NetworkedStrength);
-        Intelligence = new Stat(intelligence, entity.NetworkedIntelligence);
-        CooldownReduction = new Stat(cooldownReduction, entity.NetworkedCooldownReduction);
-        AuraRadius = new Stat(auraRadius, entity.NetworkedAuraRadius);
+        Health = new Stat(health, entity.IsServer, entity.NetworkedHealth);
+        Armour = new Stat(armour, entity.IsServer, entity.NetworkedArmour);
+        MovementSpeed = new Stat(moveSpeed, entity.IsServer, entity.NetworkedMovementSpeed);
+        AttackSpeed = new Stat(attackSpeed, entity.IsServer, entity.NetworkedAttackSpeed);
+        Strength = new Stat(strength, entity.IsServer, entity.NetworkedStrength);
+        Intelligence = new Stat(intelligence, entity.IsServer, entity.NetworkedIntelligence);
+        CooldownReduction = new Stat(cooldownReduction, entity.IsServer, entity.NetworkedCooldownReduction);
+        AuraRadius = new Stat(auraRadius, entity.IsServer, entity.NetworkedAuraRadius);
     }
 
 }

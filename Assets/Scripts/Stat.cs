@@ -23,15 +23,19 @@ public class Stat
         private set => currentValue = Mathf.Clamp(value, 0, MaxValue);
     }
 
-    public Stat(float baseValue, NetworkVariable<float> networkVariable)
+    public Stat(float baseValue, bool isServer, NetworkVariable<float> networkVariable)
     {
         this.baseValue = baseValue;
         bonusValue = 0;
         bonusMultiplier = 1f;
         CurrentValue = MaxValue;
 
-        OnCurrentValueChanged = () => {
-            networkVariable.Value = CurrentValue;
+        OnCurrentValueChanged = () =>
+        {
+            if (isServer)
+            {
+                networkVariable.Value = CurrentValue;
+            }
         };
     }
 
