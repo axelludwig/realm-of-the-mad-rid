@@ -7,6 +7,7 @@ public class PlayerMovement : NetworkBehaviour
     private Vector2 v_MoveInput;
     private Entity entity;
     private PlayerInput input;
+    private SpriteRenderer spriteRenderer;
 
     [SerializeField] private GameObject ProjectilePrefab;
     [SerializeField] private GameObject EnemyPrefab;
@@ -19,6 +20,7 @@ public class PlayerMovement : NetworkBehaviour
     void Awake()
     {
         input = GetComponent<PlayerInput>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Start()
@@ -79,6 +81,11 @@ public class PlayerMovement : NetworkBehaviour
     {
         Vector3 v_Movement = new Vector3(v_MoveInput.x, v_MoveInput.y, 0f);
         transform.position += v_Movement * entity.Stats.MovementSpeed.CurrentValue * Time.deltaTime;
+        // Gérer le flip du sprite en fonction de la direction
+        if (v_Movement.x > 0)
+            spriteRenderer.flipX = false;
+        else if (v_Movement.x < 0)
+            spriteRenderer.flipX = true;
     }
 
     /// <summary>
